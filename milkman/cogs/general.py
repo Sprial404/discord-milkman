@@ -128,13 +128,13 @@ class General(commands.Cog, name=GENERAL_COG_NAME):
         """
         embed = discord.Embed(
             title="👋",
-            description=f"{ctx.author} slapped {user.mention} for {reason}",
+            description=f"{ctx.author.mention} slapped {user.mention} for {reason}",
             color=SUCCESS_COLOR,
         )
         embed.set_image(
             url=f"https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExamNjdDN6cDh1anlhd3Y3YTM5Njc3djlhNzQ0ZXUwOHZ3aXFqODhveiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/lX03hULhgCYQ8/giphy.gif"
         )
-        embed.set_thumbnail(url=f"{ctx.author.avatar.url}")
+        embed.set_thumbnail(url=f"{user.avatar.url}")
         await ctx.send(embed=embed)
 
 
