@@ -194,7 +194,13 @@ class Fun(Cog, name=FUN_COG_NAME):
             return
 
         result = random.choice(colors)
-        msg = await ctx.send(f"Spinning the wheel 🔵🔴🟢🟡...")
+
+        embed = discord.Embed(
+            title="🔵🔴🟢🟡",
+            description=f"Spinning the wheel...",
+            color=SUCCESS_COLOR,
+        )
+        msg = await ctx.send(embed=embed)
 
         await asyncio.sleep(3)
 
@@ -204,7 +210,9 @@ class Fun(Cog, name=FUN_COG_NAME):
         else:
             response += " You lost! 😢"
 
-        await msg.edit(content=response)
+        embed.description = response
+        embed.color = SUCCESS_COLOR if picked_color == result else ERROR_COLOR
+        await msg.edit(embed=embed)
 
     @commands.hybrid_command(name="avatar", description="Get a random avatar quote.")
     async def avatar(self, ctx: Context) -> None:
