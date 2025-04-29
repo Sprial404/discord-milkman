@@ -1,0 +1,12 @@
+services:
+  server:
+    pull_policy: build
+    env_file: stack.env
+    build:
+      context: .
+    volumes:
+      - data:/data
+    restart: unless-stopped
+
+volumes:
+  data:
