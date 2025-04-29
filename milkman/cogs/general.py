@@ -4,8 +4,6 @@ This cog contains general commands that are used to help the user.
 Commands:
     - ping: Pings the bot.
     - help: Shows all commands that the bot has loaded.
-    - 8ball: Ask the bot a question.
-    - slap: Slap a user.
 """
 
 import random
@@ -70,71 +68,6 @@ class General(commands.Cog, name=GENERAL_COG_NAME):
                 name=cog_name.capitalize(), value=f"```{help_text}```", inline=False
             )
 
-        await ctx.send(embed=embed)
-
-    @commands.hybrid_command(name="8ball", description="Ask the bot a question.")
-    @app_commands.describe(question="The question to ask the bot.")
-    async def eightball(self, ctx: Context, question: str) -> None:
-        """
-        Ask the bot a question.
-
-        Args:
-            ctx (Context): The context of the command.
-            question (str): The question to ask the bot.
-        """
-        answers = [
-            "It is certain.",
-            "It is decidedly so.",
-            "You may rely on it.",
-            "Without a doubt.",
-            "Yes - definitely.",
-            "As I see, yes.",
-            "Most likely.",
-            "Outlook good.",
-            "Yes.",
-            "Signs point to yes.",
-            "Reply hazy, try again.",
-            "Ask again later.",
-            "Better not tell you now.",
-            "Cannot predict now.",
-            "Concentrate and ask again later.",
-            "Don't count on it.",
-            "My reply is no.",
-            "My sources say no.",
-            "Outlook not so good.",
-            "Very doubtful.",
-        ]
-        response = random.choice(answers)
-        embed = discord.Embed(
-            title="🎱",
-            description=f"{response}",
-            color=SUCCESS_COLOR,
-        )
-        embed.set_footer(text=f"The question was: {question}")
-        await ctx.send(embed=embed)
-
-    @commands.hybrid_command(name="slap", description="Slap a user.")
-    @app_commands.describe(user="The user to slap.", reason="The reason for the slap.")
-    async def slap(
-        self, ctx: Context, user: discord.Member, reason: str = "Because I can."
-    ) -> None:
-        """
-        Slap a user.
-
-        Args:
-            ctx (Context): The context of the command.
-            user (discord.Member): The user to slap.
-            reason (str): The reason for the slap.
-        """
-        embed = discord.Embed(
-            title="👋",
-            description=f"{ctx.author.mention} slapped {user.mention} for {reason}",
-            color=SUCCESS_COLOR,
-        )
-        embed.set_image(
-            url=f"https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExamNjdDN6cDh1anlhd3Y3YTM5Njc3djlhNzQ0ZXUwOHZ3aXFqODhveiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/lX03hULhgCYQ8/giphy.gif"
-        )
-        embed.set_thumbnail(url=f"{user.avatar.url}")
         await ctx.send(embed=embed)
 
 
