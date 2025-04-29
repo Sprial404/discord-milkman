@@ -151,7 +151,11 @@ class Fun(Cog, name=FUN_COG_NAME):
         result = random.choices(items, k=3)
 
         message = ""
-        if result[0] == result[1] == result[2]:
+        won = False
+        if result[0] == result[1] == result[2] == "🍒":
+            message = "Jackpot! 💰💰💰"
+            won = True
+        elif result[0] == result[1] == result[2]:
             message = "All matching, you won! 🎉"
             won = True
         elif result[0] == result[1] or result[1] == result[2] or result[0] == result[2]:
