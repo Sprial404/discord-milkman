@@ -34,7 +34,9 @@ class Owner(commands.Cog, name=OWNER_COG_NAME):
         scope="The scope of the syncronisation, which can be global or guild.",
     )
     @commands.is_owner()
-    async def sync(self, ctx: Context, scope: Literal["global", "guild"]) -> None:
+    async def sync(
+        self, ctx: Context, scope: Literal["global", "guild"] = "global"
+    ) -> None:
         """
         Syncronises the slash commands.
 
@@ -64,7 +66,9 @@ class Owner(commands.Cog, name=OWNER_COG_NAME):
         scope="The scope of the unsyncronisation, which can be global or guild.",
     )
     @commands.is_owner()
-    async def unsync(self, ctx: Context, scope: str) -> None:
+    async def unsync(
+        self, ctx: Context, scope: Literal["global", "guild"] = "global"
+    ) -> None:
         """
         Unsyncronises the slash commands.
 
