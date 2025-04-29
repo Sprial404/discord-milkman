@@ -8,9 +8,12 @@ from discord.ext.commands import Context
 
 from dotenv import load_dotenv
 
+from .util.database import Database
 from .constants import ERROR_COLOR
 
 load_dotenv()
+
+data_dir = os.getenv("DATA_DIR", "data")
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -70,7 +73,13 @@ console_handler = logging.StreamHandler()
 console_handler.setFormatter(CustomFormatter())
 
 # Create a file handler
-file_handler = logging.FileHandler("supervisor.log", encoding="utf-8", mode="w")
+
+# Make logs directory if not exists
+logs_dir = os.path.join(data_dir, "logs")
+os.makedirs(logs_dir, exist_ok=True)
+
+file_path = os.path.join(logs_dir, "supervisor.log")
+file_handler = logging.FileHandler(file_path, encoding="utf-8", mode="w")
 file_handler_formatter = logging.Formatter(
     "[{asctime}] [{levelname:<8}] {name}: {message}", "%Y-%m-%d %H:%M:%S", style="{"
 )
@@ -81,24 +90,42 @@ logger.addHandler(console_handler)
 logger.addHandler(file_handler)
 
 
+# Get the environment variables
+discord_token = os.getenv("DISCORD_TOKEN")
+bot_prefix = os.getenv("BOT_PREFIX")
+
+if not discord_token:
+    discord_token_file = os.getenv("DISCORD_TOKEN_FILE")
+    if not discord_token_file:
+        logger.error("The environment variable DISCORD_TOKEN is not set")
+        exit(1)
+    with open(discord_token_file, "r") as f:
+        discord_token = f.read().strip()
+
+if not bot_prefix:
+    logger.error("The environment variable BOT_PREFIX is not set")
+    exit(1)
+
+
 class Supervisor(commands.Bot):
     def __init__(self, *args, **kwargs):
         super().__init__(
             *args,
             **kwargs,
             intents=intents,
-            command_prefix=commands.when_mentioned_or(os.getenv("BOT_PREFIX")),
+            command_prefix=commands.when_mentioned_or(bot_prefix),
             help_command=None,
         )
 
         self.logger = logger
-        self.bot_prefix = os.getenv("BOT_PREFIX")
+        self.db = Database(os.path.join(data_dir, "milkman.db"))
+        self.bot_prefix = bot_prefix
 
     async def load_cogs(self) -> None:
         """
         Load the cogs by loading each file in the 'cogs/' directory.
         """
-        logs_path = f"{os.path.realpath(os.path.dirname(__file__))}/cogs"
+        logs_path = os.path.join(os.path.realpath(os.path.dirname(__file__)), "cogs")
         for file in os.listdir(logs_path):
             if file.endswith(".py"):
                 extension = file[:-3]
@@ -149,6 +176,8 @@ class Supervisor(commands.Bot):
         self.logger.info(f"Logged in as {self.user.name}")
         await self.load_cogs()
         self.update_status.start()
+        await self.db.connect()
+        await self.db.create_tables()
 
     async def on_command_completion(self, context: Context) -> None:
         """
@@ -224,4 +253,4 @@ class Supervisor(commands.Bot):
 
 
 bot = Supervisor()
-bot.run(os.getenv("DISCORD_TOKEN"))
+bot.run(discord_token)

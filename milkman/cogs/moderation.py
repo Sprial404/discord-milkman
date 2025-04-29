@@ -5,6 +5,8 @@ Commands:
     - kick: Kick a user from the server.
     - ban: Ban a user from the server.
     - warn: Warn a user.
+    - remove_warning: Remove a warning from a user.
+    - list_warnings: List all warnings for a user.
     - purge: Purge messages from the server.
 """
 
@@ -159,7 +161,12 @@ class Moderation(commands.Cog, name=MODERATION_COG_NAME):
         """
 
         member = ctx.guild.get_member(user.id) or await ctx.guild.fetch_member(user.id)
-        # TODO: Add warning to a database.
+        self.bot.db.add_warning(
+            user.id,
+            ctx.guild.id,
+            ctx.author.id,
+            reason,
+        )
         embed = discord.Embed(
             description=f"Warned **{member}** from the server by **{ctx.author}**.",
             color=SUCCESS_COLOR,
@@ -175,6 +182,58 @@ class Moderation(commands.Cog, name=MODERATION_COG_NAME):
             await ctx.send(
                 f"{member.mention}, you were warned by **{ctx.author}**!\n\nReason: {reason}"
             )
+
+    @commands.hybrid_command(
+        name="remove_warning", description="Remove a warning from a user."
+    )
+    @app_commands.describe(
+        user="The user to remove a warning from.",
+        id="The id of the warning to remove.",
+    )
+    @commands.has_permissions(manage_messages=True)
+    async def remove_warning(self, ctx: Context, user: discord.User, id: int) -> None:
+        """
+        Remove a warning from a user.
+        """
+        member = ctx.guild.get_member(user.id) or await ctx.guild.fetch_member(user.id)
+        self.bot.db.remove_warning(id, user.id, ctx.guild.id)
+        embed = discord.Embed(
+            description=f"Removed warning **{id}** from **{member}**.",
+            color=SUCCESS_COLOR,
+        )
+        await ctx.send(embed=embed)
+
+    @commands.hybrid_command(
+        name="list_warnings", description="List all warnings for a user."
+    )
+    @app_commands.describe(
+        user="The user to list warnings for.",
+    )
+    @commands.has_permissions(manage_messages=True)
+    async def list_warnings(self, ctx: Context, user: discord.User) -> None:
+        """
+        List all warnings for a user.
+        """
+        warnings = self.bot.db.get_warnings(user.id, ctx.guild.id)
+        if not warnings:
+            embed = discord.Embed(
+                description="No warnings found for this user.",
+                color=ERROR_COLOR,
+            )
+            await ctx.send(embed=embed)
+        else:
+            lines = []
+            for warning in warnings:
+                lines.append(
+                    f"• Warned by <@{warning.moderator_id}>: {warning.reason} (<t:{int(warning.created_at.timestamp())}>) - Warning ID: {warning.id}"
+                )
+            description = "\n".join(lines)
+            embed = discord.Embed(
+                title=f"Warnings for {user}",
+                description=description,
+                color=SUCCESS_COLOR,
+            )
+            await ctx.send(embed=embed)
 
     @commands.hybrid_command(
         name="purge", description="Purge messages from the server."
