@@ -219,6 +219,19 @@ class Owner(commands.Cog, name=OWNER_COG_NAME):
         Sends an embed.
         """
 
+        if color.startswith("#"):
+            color = color[1:]
+
+        try:
+            color = int(color, 16)
+        except ValueError:
+            embed = discord.Embed(
+                description="Invalid color, please enter a valid hex code.",
+                color=ERROR_COLOR,
+            )
+            await ctx.send(embed=embed)
+            return
+
         await ctx.send(
             embed=discord.Embed(title=title, description=description, color=color)
         )
