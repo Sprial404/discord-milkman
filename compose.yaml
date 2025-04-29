@@ -2,14 +2,10 @@ services:
   server:
     build:
       context: .
-    environment:
-      - DISCORD_TOKEN_FILE=/run/secrets/discord-token
-      - BOT_PREFIX=!
-      - DATA_DIR=/data
+    env_file:
+      - .env
     volumes:
       - ./data:/data
-    secrets:
-      - discord-token
     restart: unless-stopped
     develop:
       watch:
@@ -17,6 +13,3 @@ services:
           path: .
           ignore:
             - ./data
-secrets:
-  discord-token:
-    file: ./secrets/discord-token.txt
