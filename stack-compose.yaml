@@ -2,6 +2,7 @@ services:
   server:
     pull_policy: build
     env_file: stack.env
+    user: "10001:10001"
     build:
       context: .
     volumes:

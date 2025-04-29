@@ -2,6 +2,7 @@ services:
   server:
     build:
       context: .
+    user: "10001:10001"
     env_file:
       - .env
     volumes:
