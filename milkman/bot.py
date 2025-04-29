@@ -248,6 +248,13 @@ class Supervisor(commands.Bot):
                 color=ERROR_COLOR,
             )
             await ctx.send(embed=embed)
+        elif isinstance(exception, commands.BadLiteralArgument):
+            embed = discord.Embed(
+                title="Bad Literal Argument",
+                description=f"You provided an invalid literal argument. Error: `{str(exception).capitalize()}`",
+                color=ERROR_COLOR,
+            )
+            await ctx.send(embed=embed)
         else:
             raise exception
 

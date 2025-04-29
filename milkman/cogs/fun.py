@@ -14,7 +14,7 @@ from discord.ext import commands
 from discord.ext.commands import Cog
 from discord import app_commands
 from discord.ext.commands import Context
-from milkman.constants import SUCCESS_COLOR, ERROR_COLOR, FUN_COG_NAME
+from milkman.constants import SUCCESS_COLOR, ERROR_COLOR, FUN_COG_NAME, AVATAR_QUOTES
 import discord
 import random
 
@@ -201,6 +201,19 @@ class Fun(Cog, name=FUN_COG_NAME):
             response += " You lost! 😢"
 
         await msg.edit(content=response)
+
+    @commands.hybrid_command(name="avatar", description="Get a random avatar quote.")
+    async def avatar(self, ctx: Context) -> None:
+        """
+        Get a random avatar quote.
+        """
+        quote = random.choice(AVATAR_QUOTES)
+        embed = discord.Embed(
+            title="👤",
+            description=quote,
+            color=SUCCESS_COLOR,
+        )
+        await ctx.send(embed=embed)
 
 
 async def setup(bot: commands.Bot) -> None:
