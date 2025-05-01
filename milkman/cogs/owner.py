@@ -45,21 +45,21 @@ class Owner(commands.Cog, name=OWNER_COG_NAME):
             scope (str): The scope of the syncronisation.
         """
 
+        embed = discord.Embed(
+            description="Syncing slash commands...",
+            color=SUCCESS_COLOR,
+        )
+        msg = await ctx.send(embed=embed)
+
         if scope == "global":
             await self.bot.tree.sync()
-            embed = discord.Embed(
-                description="Syncronised the slash commands globally.",
-                color=SUCCESS_COLOR,
-            )
-            await ctx.send(embed=embed)
+            embed.description = "Syncronised the slash commands globally."
+            await msg.edit(embed=embed)
         elif scope == "guild":
             self.bot.tree.copy_global_to(guild=ctx.guild)
             await self.bot.tree.sync(guild=ctx.guild)
-            embed = discord.Embed(
-                description="Syncronised the slash commands for this guild.",
-                color=SUCCESS_COLOR,
-            )
-            await ctx.send(embed=embed)
+            embed.description = "Syncronised the slash commands for this guild."
+            await msg.edit(embed=embed)
 
     @commands.command(name="unsync", description="Unsyncronises the slash commands.")
     @app_commands.describe(
@@ -77,22 +77,22 @@ class Owner(commands.Cog, name=OWNER_COG_NAME):
             scope (str): The scope of the unsyncronisation.
         """
 
+        embed = discord.Embed(
+            description="Unsyncing slash commands...",
+            color=SUCCESS_COLOR,
+        )
+        msg = await ctx.send(embed=embed)
+
         if scope == "global":
             self.bot.tree.clear_commands(guild=None)
             await self.bot.tree.sync()
-            embed = discord.Embed(
-                description="Unsyncronised the slash commands globally.",
-                color=SUCCESS_COLOR,
-            )
-            await ctx.send(embed=embed)
+            embed.description = "Unsyncronised the slash commands globally."
+            await msg.edit(embed=embed)
         elif scope == "guild":
             self.bot.tree.clear_commands(guild=ctx.guild)
             await self.bot.tree.sync(guild=ctx.guild)
-            embed = discord.Embed(
-                description="Unsyncronised the slash commands for this guild.",
-                color=SUCCESS_COLOR,
-            )
-            await ctx.send(embed=embed)
+            embed.description = "Unsyncronised the slash commands for this guild."
+            await msg.edit(embed=embed)
 
     @commands.hybrid_command(name="load", description="Loads a cog.")
     @app_commands.describe(cog="The name of the cog to load.")
@@ -106,21 +106,21 @@ class Owner(commands.Cog, name=OWNER_COG_NAME):
             cog (str): The name of the cog to load.
         """
 
+        embed = discord.Embed(
+            description="Loading cog...",
+            color=SUCCESS_COLOR,
+        )
+        msg = await ctx.send(embed=embed)
+
         try:
             await self.bot.load_extension(f"cogs.{cog}")
         except Exception as e:
-            embed = discord.Embed(
-                description=f"Failed to load the cog `{cog}`",
-                color=ERROR_COLOR,
-            )
-            await ctx.send(embed=embed)
+            embed.description = f"Failed to load the cog `{cog}`"
+            await msg.edit(embed=embed)
             return
 
-        embed = discord.Embed(
-            description=f"Successfully loaded the cog `{cog}`",
-            color=SUCCESS_COLOR,
-        )
-        await ctx.send(embed=embed)
+        embed.description = f"Successfully loaded the cog `{cog}`"
+        await msg.edit(embed=embed)
 
     @commands.hybrid_command(name="unload", description="Unloads a cog.")
     @app_commands.describe(cog="The name of the cog to unload.")
@@ -134,21 +134,21 @@ class Owner(commands.Cog, name=OWNER_COG_NAME):
             cog (str): The name of the cog to unload.
         """
 
+        embed = discord.Embed(
+            description="Unloading cog...",
+            color=SUCCESS_COLOR,
+        )
+        msg = await ctx.send(embed=embed)
+
         try:
             await self.bot.unload_extension(f"cogs.{cog}")
         except Exception as e:
-            embed = discord.Embed(
-                description=f"Failed to unload the cog `{cog}`",
-                color=ERROR_COLOR,
-            )
-            await ctx.send(embed=embed)
+            embed.description = f"Failed to unload the cog `{cog}`"
+            await msg.edit(embed=embed)
             return
 
-        embed = discord.Embed(
-            description=f"Successfully unloaded the cog `{cog}`",
-            color=SUCCESS_COLOR,
-        )
-        await ctx.send(embed=embed)
+        embed.description = f"Successfully unloaded the cog `{cog}`"
+        await msg.edit(embed=embed)
 
     @commands.hybrid_command(name="reload", description="Reloads a cog.")
     @app_commands.describe(cog="The name of the cog to reload.")
@@ -162,21 +162,21 @@ class Owner(commands.Cog, name=OWNER_COG_NAME):
             cog (str): The name of the cog to reload.
         """
 
+        embed = discord.Embed(
+            description="Reloading cog...",
+            color=SUCCESS_COLOR,
+        )
+        msg = await ctx.send(embed=embed)
+
         try:
             await self.bot.reload_extension(f"cogs.{cog}")
         except Exception as e:
-            embed = discord.Embed(
-                description=f"Could not reload the cog `{cog}`",
-                color=ERROR_COLOR,
-            )
-            await ctx.send(embed=embed)
+            embed.description = f"Could not reload the cog `{cog}`"
+            await msg.edit(embed=embed)
             return
 
-        embed = discord.Embed(
-            description=f"Successfully reloaded the cog `{cog}`",
-            color=SUCCESS_COLOR,
-        )
-        await ctx.send(embed=embed)
+        embed.description = f"Successfully reloaded the cog `{cog}`"
+        await msg.edit(embed=embed)
 
     @commands.hybrid_command(name="shutdown", description="Shuts down the bot.")
     @commands.is_owner()
