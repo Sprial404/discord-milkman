@@ -2,15 +2,18 @@ services:
   server:
     build:
       context: .
-    user: "10001:10001"
+      dockerfile: Dockerfile
+    restart: unless-stopped
     env_file:
       - .env
     volumes:
-      - ./data:/data
-    restart: unless-stopped
+      - data:/data
     develop:
       watch:
         - action: rebuild
           path: .
           ignore:
             - ./data
+
+volumes:
+  data:
