@@ -60,9 +60,13 @@ class General(commands.Cog, name=GENERAL_COG_NAME):
             cog = self.bot.get_cog(cog_name)
             cog_commands = cog.get_commands()
             data = []
-            for command in cog_commands:
-                description = command.description.partition("\n")[0]
-                data.append(f"`{command.name}` - {description}")
+            if cog_commands:
+                for command in cog_commands:
+                    description = command.description.partition("\n")[0]
+                    data.append(f"`{command.name}` - {description}")
+            else:
+                data.append("No commands found.")
+
             help_text = "\n".join(data)
             embed.add_field(
                 name=cog_name.capitalize(), value=f"```{help_text}```", inline=False
