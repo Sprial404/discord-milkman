@@ -11,6 +11,8 @@ FUN_COG_NAME = "fun"
 SUCCESS_COLOR = 0xBEBEFE
 ERROR_COLOR = 0xE02B2B
 
+LYRICS_API_URL = "https://api.lyrics.ovh/v1/{artist}/{title}"
+
 AVATAR_QUOTES = [
     """
     **Moat**: It is hard to fill a cup that is already full.\n
@@ -108,4 +110,28 @@ AVATAR_QUOTES = [
     The hostiles believe that this mountain territory is protected by their... deity. And when we destroy it, we will blast a crater in their racial memory so deep,
     that they won't come within 1,000 klicks of this place ever again. And that, too, is a fact.
     """,
+    """
+    **Col. Quaritch**: You are not in Kansas anymore. You are on Pandora, ladies and gentlemen. Respect that fact every second of every day. If there is a Hell, you might wanna go there for some R & R after a tour on Pandora. Out there beyond that fence every living thing that crawls, flies, or squats in the mud wants to kill you and eat your eyes for jujubes. We have an indigenous population of humanoids called the Na'vi. They're fond of arrows dipped in a neurotoxin that will stop your heart in one minute - and they have bones reinforced with naturally occurring carbon fiber. They are very hard to kill. As head of security, it is my job to keep you alive. I will not succeed. Not with all of you. If you wish to survive, you need to cultivate a strong, mental aptitude. You got to obey the rules: Pandora rules. Rule number one...
+    """,
+]
+
+SLAP_IMAGES = [
+    "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbW4yYWR6NWZ3eDhjZHIyeXVjMDM1NGNwN2tscTIzdHZrY2I1Z2VpYyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/vxvNnIYFcYqEE/giphy.gif",
+    "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExamNjdDN6cDh1anlhd3Y3YTM5Njc3djlhNzQ0ZXUwOHZ3aXFqODhveiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/lX03hULhgCYQ8/giphy.gif",
+    "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbW4yYWR6NWZ3eDhjZHIyeXVjMDM1NGNwN2tscTIzdHZrY2I1Z2VpYyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/xT8qB7Sbwskk27Rdy8/giphy.gif",
+    "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbW4yYWR6NWZ3eDhjZHIyeXVjMDM1NGNwN2tscTIzdHZrY2I1Z2VpYyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/3XlEk2RxPS1m8/giphy.gif",
+    "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbW4yYWR6NWZ3eDhjZHIyeXVjMDM1NGNwN2tscTIzdHZrY2I1Z2VpYyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/RrLbvyvatbi36/giphy.gif",
+    "https://media.giphy.com/media/3oEdvdHf6n0US87Tri/giphy.gif?cid=ecf05e47ge0ki71i0ke0in7xqt5wmhc3nw2tj5cy1vss9z92&ep=v1_gifs_search&rid=giphy.gif&ct=g",
+    "https://media.giphy.com/media/wXgBk2fM696gM/giphy.gif?cid=ecf05e47ge0ki71i0ke0in7xqt5wmhc3nw2tj5cy1vss9z92&ep=v1_gifs_search&rid=giphy.gif&ct=g",
+    "https://media.giphy.com/media/HMyn96bq0nsw8/giphy.gif?cid=ecf05e47e57gjypfzcmq82dles78tvt219aqk92czhnnpvf2&ep=v1_gifs_search&rid=giphy.gif&ct=g",
+    "https://media.giphy.com/media/xTiTndZXxiBqFZM7E4/giphy.gif?cid=ecf05e4739yuwt1i8hqhoppqmozjw6rtpeszvfc5z1dke91r&ep=v1_gifs_search&rid=giphy.gif&ct=g",
+    "https://media.giphy.com/media/qyjexFwQwJp9yUvMxq/giphy.gif?cid=ecf05e47yoa0ly67hynwcqu6elufvjhh4en6nec1hkn42hqi&ep=v1_gifs_search&rid=giphy.gif&ct=g",
+    "https://media.giphy.com/media/AisOYaOZdrS1i/giphy.gif?cid=ecf05e4785igoy1bqcfy227om1i0e7he2qz4rd1r375r3ftr&ep=v1_gifs_search&rid=giphy.gif&ct=g",
+    "https://media.giphy.com/media/vcShFtinE7YUo/giphy.gif?cid=ecf05e471gflj7w1bmb6dp42wm4oeebhxm7e2xqd6sdcvfum&ep=v1_gifs_search&rid=giphy.gif&ct=g",
+    "https://media.giphy.com/media/nbPw0YmzhdqFm6iOfh/giphy.gif?cid=ecf05e471gflj7w1bmb6dp42wm4oeebhxm7e2xqd6sdcvfum&ep=v1_gifs_search&rid=giphy.gif&ct=g",
+    "https://media.giphy.com/media/xT1R9JQ1jUDoF4Ou64/giphy.gif?cid=ecf05e47djs4b1nezacy7pocjxueerlsra9lbk3ve347gqa9&ep=v1_gifs_search&rid=giphy.gif&ct=g",
+    "https://media.giphy.com/media/PaC0wbFRxWCkawaNBE/giphy.gif?cid=ecf05e47geecoaawbljr1qnv2il00oh6neobl3ksq4xbd66b&ep=v1_gifs_search&rid=giphy.gif&ct=g",
+    "https://media.giphy.com/media/l0IsGT7beaIsHaDv2/giphy.gif?cid=ecf05e47geecoaawbljr1qnv2il00oh6neobl3ksq4xbd66b&ep=v1_gifs_search&rid=giphy.gif&ct=g",
+    "https://media.giphy.com/media/ibd2V1YKF8kKVQzPnH/giphy.gif?cid=ecf05e47hvgg6kq6dy4rem06knlbqshye4dosyp8gq98rwwr&ep=v1_gifs_search&rid=giphy.gif&ct=g",
+    "https://tenor.com/view/squid-game-slap-slapped-kek-or-cringe-famouszaggy-gif-23535390",
 ]

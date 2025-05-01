@@ -3,18 +3,33 @@ This cog contains fun commands that are used to entertain the user.
 
 Commands:
 - 8ball: Ask the bot a question.
+- lyrics: Get the lyrics to a song.
 - slap: Slap a user.
 - roll: Roll a die.
 - coinflip: Flip a coin.
+- f: Press F to pay respect.
+- bapbap: Bapbap.
+- slot: Spin the slot machine.
+- roulette: Play roulette.
+- avatar: Get a random avatar quote.
 """
 
 import asyncio
-from typing import Literal
+import aiohttp
+from typing import Literal, Optional
 from discord.ext import commands
 from discord.ext.commands import Cog
 from discord import app_commands
 from discord.ext.commands import Context
-from milkman.constants import SUCCESS_COLOR, ERROR_COLOR, FUN_COG_NAME, AVATAR_QUOTES
+from milkman.constants import (
+    SUCCESS_COLOR,
+    ERROR_COLOR,
+    FUN_COG_NAME,
+    AVATAR_QUOTES,
+    SLAP_IMAGES,
+    LYRICS_API_URL,
+)
+from milkman.util import deduplicate_newlines
 import discord
 import random
 
@@ -26,6 +41,53 @@ class Fun(Cog, name=FUN_COG_NAME):
 
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
+
+    async def _get_lyrics(self, artist: str, title: str) -> Optional[str]:
+        """
+        Get the lyrics to a song.
+        """
+        url = LYRICS_API_URL.format(artist=artist, title=title)
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as response:
+                if response.status != 200:
+                    return None
+
+                data = await response.json()
+                return data.get("lyrics")
+
+    @commands.hybrid_command(name="lyrics", description="Get the lyrics to a song.")
+    @app_commands.describe(
+        song="The song to get the lyrics to.", artist="The artist of the song."
+    )
+    async def lyrics(self, ctx: Context, song: str, artist: str) -> None:
+        """
+        Get the lyrics to a song.
+
+        Args:
+            ctx (Context): The context of the command.
+            song (str): The song to get the lyrics to.
+            artist (str): The artist of the song.
+        """
+        embed = discord.Embed(
+            description="Searching for lyrics...",
+            color=SUCCESS_COLOR,
+        )
+        msg = await ctx.send(embed=embed)
+
+        lyrics = await self._get_lyrics(artist, song)
+        if lyrics is None:
+            embed.title = "🔴"
+            embed.description = "No lyrics found for the given song and artist."
+            embed.color = ERROR_COLOR
+            await msg.edit(embed=embed)
+            return
+
+        lyrics = deduplicate_newlines(lyrics)
+        lyrics = lyrics.replace("\n", "\n\n")
+        embed.title = "🎵"
+        embed.description = lyrics
+        embed.set_footer(text=f"Song: {song.title()} - Artist: {artist.title()}")
+        await msg.edit(embed=embed)
 
     @commands.hybrid_command(name="8ball", description="Ask the bot a question.")
     @app_commands.describe(question="The question to ask the bot.")
@@ -68,6 +130,27 @@ class Fun(Cog, name=FUN_COG_NAME):
         embed.set_footer(text=f"The question was: {question}")
         await ctx.send(embed=embed)
 
+    @commands.hybrid_command(name="crazy", description="I was crazy once.")
+    async def crazy(self, ctx: Context, times: int = 1) -> None:
+        """
+        I was crazy once.
+
+        Args:
+            ctx (Context): The context of the command.
+            times (int): The number of times to repeat the message, defaults to 1.
+        """
+        if times < 1:
+            embed = discord.Embed(
+                title="🔴",
+                description="Invalid number of times, please enter a valid positive integer.",
+                color=ERROR_COLOR,
+            )
+            await ctx.send(embed=embed)
+            return
+
+        prompt = "Crazy?\nI was crazy once.\nThey locked me in a room.\nA rubber room.\nA rubber room with rats.\nAnd rats make me crazy.\n"
+        await ctx.send(prompt * times)
+
     @commands.hybrid_command(name="slap", description="Slap a user.")
     @app_commands.describe(user="The user to slap.", reason="The reason for the slap.")
     async def slap(
@@ -86,34 +169,68 @@ class Fun(Cog, name=FUN_COG_NAME):
             description=f"{ctx.author.mention} slapped {user.mention} for {reason}",
             color=SUCCESS_COLOR,
         )
-        embed.set_image(
-            url=f"https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExamNjdDN6cDh1anlhd3Y3YTM5Njc3djlhNzQ0ZXUwOHZ3aXFqODhveiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/lX03hULhgCYQ8/giphy.gif"
-        )
+        embed.set_image(url=random.choice(SLAP_IMAGES))
         embed.set_thumbnail(url=f"{user.avatar.url}")
         await ctx.send(embed=embed)
 
     @commands.hybrid_command(name="roll", description="Roll a die.")
-    @app_commands.describe(sides="The number of sides on the die.")
-    async def roll(self, ctx: Context, sides: int) -> None:
+    @app_commands.describe(
+        sides="The number of sides on the die.", dice="The number of dice to roll."
+    )
+    async def roll(self, ctx: Context, sides: int, dice: int = 1) -> None:
         """
         Roll a die.
 
         Args:
             ctx (Context): The context of the command.
             sides (int): The number of sides on the die.
+            dice (int): The number of dice to roll, defaults to 1.
         """
-        result = random.randint(1, sides)
+        if sides < 1:
+            embed = discord.Embed(
+                title="🔴",
+                description="Invalid number of sides, please enter a valid positive integer.",
+                color=ERROR_COLOR,
+            )
+            await ctx.send(embed=embed)
+            return
+
+        if dice < 1:
+            embed = discord.Embed(
+                title="🔴",
+                description="Invalid number of dice, please enter a valid positive integer.",
+                color=ERROR_COLOR,
+            )
+            await ctx.send(embed=embed)
+            return
+
+        dice_word = "die" if dice == 1 else "dice"
+
         embed = discord.Embed(
-            title="🎲",
-            description=f"{ctx.author.mention} rolled a {result} on a {sides}-sided die.",
+            description=f"{ctx.author.mention} is rolling {dice:,} {dice_word} on a {sides:,}-sided die...",
             color=SUCCESS_COLOR,
         )
-        await ctx.send(embed=embed)
+        msg = await ctx.send(embed=embed)
+
+        results = [random.randint(1, sides) for _ in range(dice)]
+        total = sum(results)
+        results_str = ", ".join([f"{result:,}" for result in results])
+
+        embed.title = "🎲"
+        embed.description = f"{ctx.author.mention} rolled {dice:,} {dice_word} on a {sides:,}-sided die."
+
+        if 1 < len(results) <= 12:
+            embed.add_field(name="Results", value=results_str)
+        embed.add_field(name="Total", value=f"**{total:,}**")
+        await msg.edit(embed=embed)
 
     @commands.hybrid_command(name="coinflip", description="Flip a coin.")
     async def coinflip(self, ctx: Context) -> None:
         """
         Flip a coin.
+
+        Args:
+            ctx (Context): The context of the command.
         """
         result = random.choice(["Heads", "Tails"])
         await ctx.send(f"The coin landed on {result}.")
@@ -123,6 +240,10 @@ class Fun(Cog, name=FUN_COG_NAME):
     async def f(self, ctx: Context, reason: commands.clean_content = None) -> None:
         """
         Press F to pay respect.
+
+        Args:
+            ctx (Context): The context of the command.
+            reason (str): The reason for the respect.
         """
         hearts = ["💖", "💙", "💚", "💛", "💜", "💝", "💞", "💟", "❤"]
         reason = f"for **{reason}**" if reason else ""
@@ -135,6 +256,9 @@ class Fun(Cog, name=FUN_COG_NAME):
     async def bapbap(self, ctx: Context) -> None:
         """
         Bapbap.
+
+        Args:
+            ctx (Context): The context of the command.
         """
         await ctx.send(
             "It's called bapbap because that's what it says when you start the round."
@@ -146,6 +270,9 @@ class Fun(Cog, name=FUN_COG_NAME):
     async def slot(self, ctx: Context) -> None:
         """
         Spin the slot machine.
+
+        Args:
+            ctx (Context): The context of the command.
         """
         items = ["🍎", "🍊", "🍌", "🍇", "🍓", "🍒", "🍑", "🍍", "🥝", "🥑"]
         result = random.choices(items, k=3)
@@ -180,6 +307,10 @@ class Fun(Cog, name=FUN_COG_NAME):
     ) -> None:
         """
         Play roulette.
+
+        Args:
+            ctx (Context): The context of the command.
+            color (str): The color to bet on.
         """
         colors = ["red", "black", "green", "yellow"]
 
@@ -218,6 +349,9 @@ class Fun(Cog, name=FUN_COG_NAME):
     async def avatar(self, ctx: Context) -> None:
         """
         Get a random avatar quote.
+
+        Args:
+            ctx (Context): The context of the command.
         """
         quote = random.choice(AVATAR_QUOTES)
         embed = discord.Embed(
