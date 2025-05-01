@@ -189,13 +189,15 @@ class Supervisor(commands.Bot):
         full_command_name = context.command.qualified_name
         split = full_command_name.split(" ")
         executed_command = str(split[0])
+        kwargs = context.kwargs
+        args = context.args
         if context.guild is not None:
             self.logger.info(
-                f"Executed {executed_command} command in {context.guild.name} (ID: {context.guild.id}) by {context.author} (ID: {context.author.id})"
+                f"Executed {executed_command} command in {context.guild.name} (ID: {context.guild.id}) by {context.author} (ID: {context.author.id}) with args: {args if args else '(empty)'} and kwargs: {kwargs if kwargs else '(empty)'}"
             )
         else:
             self.logger.info(
-                f"Executed {executed_command} command by {context.author} (ID: {context.author.id}) in DMs"
+                f"Executed {executed_command} command by {context.author} (ID: {context.author.id}) in DMs with args: {args if args else '(empty)'} and kwargs: {kwargs if kwargs else '(empty)'}"
             )
 
     async def on_command_error(
@@ -252,6 +254,20 @@ class Supervisor(commands.Bot):
             embed = discord.Embed(
                 title="Bad Literal Argument",
                 description=f"You provided an invalid literal argument. Error: `{str(exception).capitalize()}`",
+                color=ERROR_COLOR,
+            )
+            await ctx.send(embed=embed)
+        elif isinstance(exception, commands.BadArgument):
+            embed = discord.Embed(
+                title="Bad Argument",
+                description=f"You provided an invalid argument. Error: `{str(exception).capitalize()}`",
+                color=ERROR_COLOR,
+            )
+            await ctx.send(embed=embed)
+        elif isinstance(exception, commands.CommandNotFound):
+            embed = discord.Embed(
+                title="Command Not Found",
+                description="The command you provided was not found.",
                 color=ERROR_COLOR,
             )
             await ctx.send(embed=embed)
