@@ -203,6 +203,25 @@ class Fun(Cog, name=FUN_COG_NAME):
             )
             await ctx.send(embed=embed)
             return
+        
+        if sides > 100:
+            embed = discord.Embed(
+                title="🔴",
+                description="Too many sides, please enter a number less than 100.",
+                color=ERROR_COLOR,
+            )
+            await ctx.send(embed=embed)
+            return
+        
+        if dice > 200:
+            embed = discord.Embed(
+                title="🔴",
+                description="Too many dice, please enter a number less than 200.",
+                color=ERROR_COLOR,
+            )
+            await ctx.send(embed=embed)
+            return
+        
 
         dice_word = "die" if dice == 1 else "dice"
 
