@@ -286,6 +286,7 @@ class Fun(Cog, name=FUN_COG_NAME):
     @commands.hybrid_command(
         name="slot", description="Spin the slot machine.", aliases=["spin", "gamble"]
     )
+    @commands.cooldown(1, 10, commands.BucketType.user)
     async def slot(self, ctx: Context) -> None:
         """
         Spin the slot machine.
@@ -321,6 +322,7 @@ class Fun(Cog, name=FUN_COG_NAME):
 
     @commands.hybrid_command(name="roulette", description="Play roulette.")
     @app_commands.describe(color="The color to bet on.")
+    @commands.cooldown(1, 10, commands.BucketType.user)
     async def roulette(
         self, ctx: Context, color: Literal["red", "black", "green", "yellow"]
     ) -> None:
