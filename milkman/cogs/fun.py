@@ -148,6 +148,15 @@ class Fun(Cog, name=FUN_COG_NAME):
             await ctx.send(embed=embed)
             return
 
+        if times > 20:
+            embed = discord.Embed(
+                title="🔴",
+                description="Too many times, please enter a number less than 20.",
+                color=ERROR_COLOR,
+            )
+            await ctx.send(embed=embed)
+            return
+
         prompt = "Crazy?\nI was crazy once.\nThey locked me in a room.\nA rubber room.\nA rubber room with rats.\nAnd rats make me crazy.\n"
         await ctx.send(prompt * times)
 
