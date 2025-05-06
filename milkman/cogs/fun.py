@@ -131,6 +131,7 @@ class Fun(Cog, name=FUN_COG_NAME):
         await ctx.send(embed=embed)
 
     @commands.hybrid_command(name="crazy", description="I was crazy once.")
+    @commands.cooldown(1, 60 * 3, commands.BucketType.user)
     async def crazy(self, ctx: Context, times: int = 1) -> None:
         """
         I was crazy once.
