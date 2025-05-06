@@ -152,7 +152,7 @@ class Fun(Cog, name=FUN_COG_NAME):
         if times > 10:
             embed = discord.Embed(
                 title="🔴",
-                description="Too many times, please enter a number less than 20.",
+                description="Too many times, please enter a number less than 10.",
                 color=ERROR_COLOR,
             )
             await ctx.send(embed=embed)
