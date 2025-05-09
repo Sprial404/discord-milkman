@@ -124,12 +124,12 @@ class Database:
             rows = await cursor.fetchall()
             return [
                 Warning(
-                    id=row["id"],
-                    user_id=row["user_id"],
-                    guild_id=row["guild_id"],
-                    moderator_id=row["moderator_id"],
-                    reason=row["reason"],
-                    created_at=row["created_at"],
+                    id=row[0],
+                    user_id=row[1],
+                    guild_id=row[2],
+                    moderator_id=row[3],
+                    reason=row[4],
+                    created_at=row[5],
                 )
                 for row in rows
             ]
