@@ -129,7 +129,7 @@ class Database:
                     guild_id=row[2],
                     moderator_id=row[3],
                     reason=row[4],
-                    created_at=row[5],
+                    created_at=datetime.fromisoformat(row[5]),
                 )
                 for row in rows
             ]
