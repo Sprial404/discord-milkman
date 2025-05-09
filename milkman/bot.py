@@ -228,10 +228,9 @@ class Supervisor(commands.Bot):
             )
             await ctx.send(embed=embed)
         elif isinstance(exception, commands.MissingPermissions):
-            missing_permissions = [perm.name for perm in exception.missing_permissions]
             embed = discord.Embed(
                 title="Missing Permissions",
-                description=f"You do not have permission to use this command. Required permission(s): `{', '.join(missing_permissions)}`.",
+                description=f"You do not have permission to use this command. Required permission(s): `{', '.join(exception.missing_permissions)}`.",
                 color=ERROR_COLOR,
             )
             await ctx.send(embed=embed)
