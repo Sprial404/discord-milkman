@@ -5,11 +5,10 @@ import random
 import discord
 from discord.ext import commands, tasks
 from discord.ext.commands import Context
-
 from dotenv import load_dotenv
 
-from .util.database import Database
 from .constants import ERROR_COLOR
+from .util.database import Database
 
 load_dotenv()
 
@@ -56,12 +55,15 @@ class CustomFormatter(logging.Formatter):
             str: The formatted log message.
         """
         log_color = self.COLORS.get(record.levelno, self.RESET)
-        format = "(black){asctime}(reset) (levelcolor){levelname:<8}(reset) (white){name}(reset) - {message}"
-        format = format.replace("(black)", self.BLACK)
-        format = format.replace("(reset)", self.RESET)
-        format = format.replace("(levelcolor)", log_color)
-        format = format.replace("(white)", self.WHITE + self.BOLD)
-        formatter = logging.Formatter(format, "%Y-%m-%d %H:%M:%S", style="{")
+        format_str = (
+            "(black){asctime}(reset) (levelcolor){levelname:<8}(reset) (white){name}(reset) - {message}".replace(
+                "(black)", self.BLACK
+            )
+            .replace("(reset)", self.RESET)
+            .replace("(levelcolor)", log_color)
+            .replace("(white)", self.WHITE + self.BOLD)
+        )
+        formatter = logging.Formatter(format_str, "%Y-%m-%d %H:%M:%S", style="{")
         return formatter.format(record)
 
 
@@ -88,7 +90,6 @@ file_handler.setFormatter(file_handler_formatter)
 # Add the handlers to the logger
 logger.addHandler(console_handler)
 logger.addHandler(file_handler)
-
 
 # Get the environment variables
 discord_token = os.getenv("DISCORD_TOKEN")
@@ -171,7 +172,7 @@ class Supervisor(commands.Bot):
 
     async def setup_hook(self) -> None:
         """
-        Setup the bot.
+        Set up the bot.
         """
         self.logger.info(f"Logged in as {self.user.name}")
         await self.load_cogs()
@@ -193,11 +194,16 @@ class Supervisor(commands.Bot):
         args = context.args
         if context.guild is not None:
             self.logger.info(
-                f"Executed {executed_command} command in {context.guild.name} (ID: {context.guild.id}) by {context.author} (ID: {context.author.id}) with args: {args if args else '(empty)'} and kwargs: {kwargs if kwargs else '(empty)'}"
+                (
+                    f"Executed {executed_command} command in {context.guild.name} (ID: {context.guild.id}) by"
+                    f"{context.author} (ID: {context.author.id}) with args: {args if args else '(empty)'} and"
+                    f"kwargs: {kwargs if kwargs else '(empty)'}"
+                )
             )
         else:
             self.logger.info(
-                f"Executed {executed_command} command by {context.author} (ID: {context.author.id}) in DMs with args: {args if args else '(empty)'} and kwargs: {kwargs if kwargs else '(empty)'}"
+                f"Executed {executed_command} command by {context.author} (ID: {context.author.id}) in DMs with args:"
+                f" {args if args else '(empty)'} and kwargs: {kwargs if kwargs else '(empty)'}"
             )
 
     async def on_command_error(
@@ -207,7 +213,7 @@ class Supervisor(commands.Bot):
         The code in this event is executed every time a command has *failed*.
 
         Args:
-            context (Context): The context of the command that failed.
+            ctx (Context): The context of the command that failed.
             exception (Exception): The exception that was raised.
         """
         if isinstance(exception, commands.CommandOnCooldown):
@@ -216,7 +222,12 @@ class Supervisor(commands.Bot):
             hours = hours % 24
             embed = discord.Embed(
                 title="Slow down!",
-                description=f"You are being rate limited. Please wait {f'{hours} hours, ' if round(hours) > 0 else ''}{f'{minutes} minutes, ' if round(minutes) > 0 else ''}{f'{seconds} seconds' if round(seconds) > 0 else ''}.",
+                description=(
+                    f"You are being rate limited. Please wait "
+                    f"{f'{hours} hours, ' if round(hours) > 0 else ''}"
+                    f"{f'{minutes} minutes, ' if round(minutes) > 0 else ''}"
+                    f"{f'{seconds} seconds' if round(seconds) > 0 else ''}."
+                ),
                 color=ERROR_COLOR,
             )
             await ctx.send(embed=embed)
@@ -230,15 +241,20 @@ class Supervisor(commands.Bot):
         elif isinstance(exception, commands.MissingPermissions):
             embed = discord.Embed(
                 title="Missing Permissions",
-                description=f"You do not have permission to use this command. Required permission(s): `{', '.join(exception.missing_permissions)}`.",
+                description=(
+                    f"You do not have permission to use this command. "
+                    f"Required permission(s): `{', '.join(exception.missing_permissions)}`."
+                ),
                 color=ERROR_COLOR,
             )
             await ctx.send(embed=embed)
         elif isinstance(exception, commands.BotMissingPermissions):
-            missing_permissions = [perm.name for perm in exception.missing_permissions]
             embed = discord.Embed(
                 title="Bot Missing Permissions",
-                description=f"I am missing the following permissions to use this command: `{', '.join(missing_permissions)}`.",
+                description=(
+                    f"I am missing the following permissions to use this command: "
+                    f"`{', '.join(exception.missing_permissions)}`."
+                ),
                 color=ERROR_COLOR,
             )
             await ctx.send(embed=embed)
