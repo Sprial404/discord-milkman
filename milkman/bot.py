@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import os
 import random
@@ -9,14 +10,6 @@ from dotenv import load_dotenv
 
 from .constants import ERROR_COLOR
 from .util.database import Database
-
-load_dotenv()
-
-data_dir = os.getenv("DATA_DIR", "data")
-
-intents = discord.Intents.default()
-intents.message_content = True
-intents.reactions = True
 
 
 class CustomFormatter(logging.Formatter):
@@ -67,60 +60,27 @@ class CustomFormatter(logging.Formatter):
         return formatter.format(record)
 
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-
-# Create a console handler
-console_handler = logging.StreamHandler()
-console_handler.setFormatter(CustomFormatter())
-
-# Create a file handler
-
-# Make logs directory if not exists
-logs_dir = os.path.join(data_dir, "logs")
-os.makedirs(logs_dir, exist_ok=True)
-
-file_path = os.path.join(logs_dir, "supervisor.log")
-file_handler = logging.FileHandler(file_path, encoding="utf-8", mode="w")
-file_handler_formatter = logging.Formatter(
-    "[{asctime}] [{levelname:<8}] {name}: {message}", "%Y-%m-%d %H:%M:%S", style="{"
-)
-file_handler.setFormatter(file_handler_formatter)
-
-# Add the handlers to the logger
-logger.addHandler(console_handler)
-logger.addHandler(file_handler)
-
-# Get the environment variables
-discord_token = os.getenv("DISCORD_TOKEN")
-bot_prefix = os.getenv("BOT_PREFIX")
-
-if not discord_token:
-    discord_token_file = os.getenv("DISCORD_TOKEN_FILE")
-    if not discord_token_file:
-        logger.error("The environment variable DISCORD_TOKEN is not set")
-        exit(1)
-    with open(discord_token_file, "r") as f:
-        discord_token = f.read().strip()
-
-if not bot_prefix:
-    logger.error("The environment variable BOT_PREFIX is not set")
-    exit(1)
-
-
 class Supervisor(commands.Bot):
-    def __init__(self, *args, **kwargs):
+    def __init__(
+        self,
+        *args,
+        bot_prefix: str,
+        data_path: str,
+        logger: logging.Logger,
+        db: Database,
+        **kwargs,
+    ):
         super().__init__(
             *args,
-            **kwargs,
-            intents=intents,
             command_prefix=commands.when_mentioned_or(bot_prefix),
             help_command=None,
+            **kwargs,
         )
 
         self.logger = logger
-        self.db = Database(os.path.join(data_dir, "milkman.db"))
+        self.data_path = data_path
         self.bot_prefix = bot_prefix
+        self.db = db
 
     async def load_cogs(self) -> None:
         """
@@ -290,5 +250,69 @@ class Supervisor(commands.Bot):
             raise exception
 
 
-bot = Supervisor()
-bot.run(discord_token)
+async def main() -> None:
+    """
+    The main function of the bot that is responsible for configuring the parameters of the bot
+    and setting up the logging system.
+    """
+    load_dotenv()
+
+    data_dir = os.getenv("DATA_DIR", "data")
+
+    intents = discord.Intents.default()
+    intents.message_content = True
+    intents.reactions = True
+
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.INFO)
+
+    # Create a console handler
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(CustomFormatter())
+
+    # Create a file handler
+
+    # Make logs directory if not exists
+    logs_dir = os.path.join(data_dir, "logs")
+    os.makedirs(logs_dir, exist_ok=True)
+
+    file_path = os.path.join(logs_dir, "supervisor.log")
+    file_handler = logging.FileHandler(file_path, encoding="utf-8", mode="w")
+    file_handler_formatter = logging.Formatter(
+        "[{asctime}] [{levelname:<8}] {name}: {message}", "%Y-%m-%d %H:%M:%S", style="{"
+    )
+    file_handler.setFormatter(file_handler_formatter)
+
+    # Add the handlers to the logger
+    logger.addHandler(console_handler)
+    logger.addHandler(file_handler)
+
+    # Get the environment variables
+    discord_token = os.getenv("DISCORD_TOKEN")
+    bot_prefix = os.getenv("BOT_PREFIX")
+
+    if not discord_token:
+        discord_token_file = os.getenv("DISCORD_TOKEN_FILE")
+        if not discord_token_file:
+            logger.error("The environment variable DISCORD_TOKEN is not set")
+            exit(1)
+        with open(discord_token_file, "r") as f:
+            discord_token = f.read().strip()
+
+    if not bot_prefix:
+        logger.error("The environment variable BOT_PREFIX is not set")
+        exit(1)
+
+    db = Database(os.path.join(data_dir, "milkman.db"))
+
+    async with Supervisor(
+        data_path=data_dir,
+        db=db,
+        bot_prefix=bot_prefix,
+        logger=logger,
+        intents=intents,
+    ) as bot:
+        await bot.start(discord_token)
+
+
+asyncio.run(main())
