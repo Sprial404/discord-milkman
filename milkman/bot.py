@@ -134,6 +134,9 @@ class Supervisor(commands.Bot):
         """
         Set up the bot.
         """
+        if self.user is None:
+            raise RuntimeError("The bot has not been logged in yet.")
+
         self.logger.info(f"Logged in as {self.user.name}")
         await self.load_cogs()
         self.update_status.start()
@@ -147,6 +150,9 @@ class Supervisor(commands.Bot):
         Args:
             context (Context): The context of the command that has been executed.
         """
+        if context.command is None:
+            return
+
         full_command_name = context.command.qualified_name
         split = full_command_name.split(" ")
         executed_command = str(split[0])
@@ -315,4 +321,5 @@ async def main() -> None:
         await bot.start(discord_token)
 
 
-asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(main())
