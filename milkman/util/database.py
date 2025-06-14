@@ -47,7 +47,12 @@ class Database:
     async def create_tables(self) -> None:
         """
         Create the tables in the database from the schema.sql file.
+        Raises:
+            RuntimeError: If the database connection is not established.
         """
+        if self.connection is None:
+            raise RuntimeError("Database connection is not established. Call connect() first.")
+
         database_schema_path = os.path.join(
             os.path.realpath(os.path.dirname(__file__)), "schema.sql"
         )
@@ -76,7 +81,13 @@ class Database:
             guild_id (str): The id of the guild to warn the user in.
             moderator_id (str): The id of the moderator who warned the user.
             reason (str): The reason for the warning.
+
+        Raises:
+            RuntimeError: If the database connection is not established or if the insert operation fails.
         """
+        if self.connection is None:
+            raise RuntimeError("Database connection is not established. Call connect() first.")
+
         await self.connection.execute(
             "INSERT INTO warns (user_id, guild_id, moderator_id, reason) VALUES (?, ?, ?, ?)",
             (user_id, guild_id, moderator_id, reason),
@@ -96,7 +107,13 @@ class Database:
             id (int): The id of the warning to remove.
             user_id (str): The id of the user to remove the warning for.
             guild_id (str): The id of the guild to remove the warning for.
+
+        Raises:
+            RuntimeError: If the database connection is not established or if the delete operation fails.
         """
+        if self.connection is None:
+            raise RuntimeError("Database connection is not established. Call connect() first.")
+
         await self.connection.execute(
             "DELETE FROM warns WHERE id = ? AND user_id = ? AND guild_id = ?",
             (id, user_id, guild_id),
@@ -116,7 +133,13 @@ class Database:
 
         Returns:
             list[Warning]: A list of warnings.
+
+        Raises:
+            RuntimeError: If the database connection is not established.
         """
+        if self.connection is None:
+            raise RuntimeError("Database connection is not established. Call connect() first.")
+
         async with self.connection.execute(
             "SELECT * FROM warns WHERE user_id = ? AND guild_id = ? ORDER BY created_at DESC",
             (user_id, guild_id),
