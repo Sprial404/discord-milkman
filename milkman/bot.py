@@ -98,7 +98,7 @@ class Supervisor(commands.Bot):
                 except Exception as e:
                     exception = f"{type(e).__name__}: {e}"
                     self.logger.error(
-                        f"Failed to load extension: {extension}: Error: {exception}"
+                        f"Failed to load extension: {extension}: Error: {exception}", exc_info=True
                     )
 
     @tasks.loop(minutes=1.0)
@@ -138,10 +138,10 @@ class Supervisor(commands.Bot):
             raise RuntimeError("The bot has not been logged in yet.")
 
         self.logger.info(f"Logged in as {self.user.name}")
-        await self.load_cogs()
-        self.update_status.start()
         await self.db.connect()
         await self.db.create_tables()
+        await self.load_cogs()
+        self.update_status.start()
 
     async def on_command_completion(self, context: Context) -> None:
         """
@@ -269,8 +269,8 @@ async def main() -> None:
     intents.message_content = True
     intents.reactions = True
 
-    logger = logging.getLogger(__name__)
-    logger.setLevel(logging.INFO)
+    root_logger = logging.getLogger()
+    root_logger.setLevel(logging.INFO)
 
     # Create a console handler
     console_handler = logging.StreamHandler()
@@ -288,10 +288,14 @@ async def main() -> None:
         "[{asctime}] [{levelname:<8}] {name}: {message}", "%Y-%m-%d %H:%M:%S", style="{"
     )
     file_handler.setFormatter(file_handler_formatter)
+    file_handler.setLevel(logging.DEBUG)
 
     # Add the handlers to the logger
-    logger.addHandler(console_handler)
-    logger.addHandler(file_handler)
+    root_logger.addHandler(console_handler)
+    root_logger.addHandler(file_handler)
+
+    # Create a logger for the bot
+    logger = logging.getLogger(__name__)
 
     # Get the environment variables
     discord_token = os.getenv("DISCORD_TOKEN")
