@@ -5,9 +5,9 @@ This module contains the Database class, which is used to manage the database.
 import aiosqlite
 import os
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
-
+from typing import Optional
 
 @dataclass
 class Warning:
@@ -21,6 +21,20 @@ class Warning:
     moderator_id: str
     reason: str
     created_at: datetime
+
+@dataclass
+class TemporaryChannel:
+    """
+    A class for storing temporary channel information.
+    """
+
+    id: int
+    channel_id: str
+    guild_id: str
+    creator_id: str
+    is_deleted: bool
+    created_at: datetime
+    deleted_at: Optional[datetime]
 
 
 class Database:
@@ -63,8 +77,110 @@ class Database:
     async def close(self) -> None:
         """
         Close the connection to the database.
+        Raises:
+            RuntimeError: If the database connection is not established.
         """
+        if self.connection is None:
+            raise RuntimeError("Database connection is not established. Call connect() first.")
+
         await self.connection.close()
+
+    async def add_temporary_channel(
+        self,
+        channel_id: str,
+        guild_id: str,
+        user_id: str,
+    ) -> TemporaryChannel:
+        """
+        Add a temporary channel to the database.
+
+        Args:
+            channel_id (str): The id of the temporary channel.
+            guild_id (str): The id of the guild the channel belongs to.
+            user_id (str): The id of the user who created the channel.
+
+        Returns:
+            TemporaryChannel: An instance of TemporaryChannel containing the details of the added channel.
+
+        Raises:
+            RuntimeError: If the database connection is not established or if the insert operation fails.
+        """
+        if self.connection is None:
+            raise RuntimeError("Database connection is not established. Call connect() first.")
+
+        cursor = await self.connection.execute(
+            "INSERT INTO temporary_channels (channel_id, guild_id, creator_id) VALUES (?, ?, ?)",
+            (channel_id, guild_id, user_id),
+        )
+        await self.connection.commit()
+
+        if cursor.lastrowid is None:
+            raise RuntimeError("Failed to insert temporary channel into the database.")
+        
+        temporary_channel = TemporaryChannel(
+            id=cursor.lastrowid,
+            channel_id=channel_id,
+            guild_id=guild_id,
+            creator_id=user_id,
+            is_deleted=False,
+            created_at=datetime.now(),
+            deleted_at=None
+        )
+        return temporary_channel
+
+    async def remove_temporary_channel(
+        self,
+        channel_id: str,
+        guild_id: str,
+    ) -> None:
+        """
+        Remove a temporary channel from the database.
+        Args:
+            channel_id (str): The id of the temporary channel to remove.
+            guild_id (str): The id of the guild the channel belongs to.
+
+        Raises:
+            RuntimeError: If the database connection is not established or if the update operation fails.
+        """
+    
+        if self.connection is None:
+            raise RuntimeError("Database connection is not established. Call connect() first.")
+
+        await self.connection.execute(
+            "UPDATE temporary_channels SET is_deleted = 1, deleted_at = ? WHERE channel_id = ? AND guild_id = ?",
+            (datetime.now().isoformat(), channel_id, guild_id),
+        )
+        await self.connection.commit()
+
+    async def get_active_temporary_channels(self) -> list[TemporaryChannel]:
+        """
+        Get all temporary channels that have not been deleted.
+
+        Returns:
+            list[TemporaryChannel]: A list of temporary channels.
+
+        Raises:
+            RuntimeError: If the database connection is not established.
+        """
+        if self.connection is None:
+            raise RuntimeError("Database connection is not established. Call connect() first.")
+
+        async with self.connection.execute(
+            "SELECT * FROM temporary_channels WHERE is_deleted = 0",
+        ) as cursor:
+            rows = await cursor.fetchall()
+            return [
+                TemporaryChannel(
+                    id=row[0],
+                    channel_id=row[1],
+                    guild_id=row[2],
+                    creator_id=row[3],
+                    is_deleted=bool(row[4]),
+                    created_at=datetime.fromisoformat(row[5]),
+                    deleted_at=datetime.fromisoformat(row[6]) if row[6] else None,
+                )
+                for row in rows
+            ]
 
     async def add_warning(
         self,
