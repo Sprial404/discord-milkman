@@ -7,9 +7,12 @@ GENERAL_COG_NAME = "general"
 REACTION_ROLES_COG_NAME = "reaction_roles"
 MODERATION_COG_NAME = "moderation"
 FUN_COG_NAME = "fun"
+TEMPORARY_VOICE_COG_NAME = "temporary_voice"
 
 SUCCESS_COLOR = 0xBEBEFE
 ERROR_COLOR = 0xE02B2B
+
+TEMPORARY_VOICE_CHANNEL_NAME = "🕳️ Blackhole"
 
 LYRICS_API_URL = "https://api.lyrics.ovh/v1/{artist}/{title}"
 
