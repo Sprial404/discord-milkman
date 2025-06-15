@@ -71,7 +71,7 @@ class Fun(Cog, name=FUN_COG_NAME):
         """
         embed = discord.Embed(
             title="👋",
-            description=f"{ctx.author.mention} is gonna touch you, {user.mention}. Because you {reason}",
+            description=f"{ctx.author.mention} is gonna touch you, {user.mention}. Because {reason}",
             color=SUCCESS_COLOR,
         )
 
