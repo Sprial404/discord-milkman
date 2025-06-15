@@ -12,6 +12,7 @@ Commands:
 - slot: Spin the slot machine.
 - roulette: Play roulette.
 - avatar: Get a random avatar quote.
+- touch: Touch a user.
 """
 
 import asyncio
@@ -54,6 +55,32 @@ class Fun(Cog, name=FUN_COG_NAME):
 
                 data = await response.json()
                 return data.get("lyrics")
+
+    @commands.hybrid_command(name="touch", description="Touch a user.")
+    @app_commands.describe(user="The user to touch.", reason="The reason for the touch.")
+    async def touch(
+        self, ctx: Context, user: discord.Member, reason: str = "Because I can."
+    ) -> None:
+        """
+        Touch a user.
+
+        Args:
+            ctx (Context): The context of the command.
+            user (discord.Member): The user to touch.
+            reason (str): The reason for the touch.
+        """
+        embed = discord.Embed(
+            title="👋",
+            description=f"{ctx.author.mention} is gonna touch you, {user.mention}. Because you {reason}",
+            color=SUCCESS_COLOR,
+        )
+
+        if user.avatar:
+            embed.set_thumbnail(url=f"{user.avatar.url}")
+        else:
+            embed.set_thumbnail(url="https://cdn.discordapp.com/embed/avatars/0.png")
+
+        await ctx.send(embed=embed)
 
     @commands.hybrid_command(name="lyrics", description="Get the lyrics to a song.")
     @app_commands.describe(
@@ -180,7 +207,12 @@ class Fun(Cog, name=FUN_COG_NAME):
             color=SUCCESS_COLOR,
         )
         embed.set_image(url=random.choice(SLAP_IMAGES))
-        embed.set_thumbnail(url=f"{user.avatar.url}")
+
+        if user.avatar:
+            embed.set_thumbnail(url=f"{user.avatar.url}")
+        else:
+            embed.set_thumbnail(url="https://cdn.discordapp.com/embed/avatars/0.png")
+
         await ctx.send(embed=embed)
 
     @commands.hybrid_command(name="roll", description="Roll a die.")
@@ -266,7 +298,7 @@ class Fun(Cog, name=FUN_COG_NAME):
 
     @commands.hybrid_command(name="f", description="Press F to pay respect")
     @app_commands.describe(reason="The reason for the respect.")
-    async def f(self, ctx: Context, reason: commands.clean_content = None) -> None:
+    async def f(self, ctx: Context, reason: commands.clean_content | None = None) -> None:
         """
         Press F to pay respect.
 
@@ -275,10 +307,10 @@ class Fun(Cog, name=FUN_COG_NAME):
             reason (str): The reason for the respect.
         """
         hearts = ["💖", "💙", "💚", "💛", "💜", "💝", "💞", "💟", "❤"]
-        reason = f"for **{reason}**" if reason else ""
+        formatted_reason = f"for **{reason}**" if reason else ""
 
         await ctx.send(
-            f"**{ctx.author.mention}** has paid their respects {reason} {random.choice(hearts)}"
+            f"**{ctx.author.mention}** has paid their respects {formatted_reason} {random.choice(hearts)}"
         )
 
     @commands.hybrid_command(name="bapbap", description="Bapbap.")
