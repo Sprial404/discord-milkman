@@ -270,6 +270,7 @@ async def main() -> None:
     intents.reactions = True
 
     root_logger = logging.getLogger()
+    root_logger.setLevel(logging.DEBUG)
 
     # Create a console handler
     console_handler = logging.StreamHandler()
