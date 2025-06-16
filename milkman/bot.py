@@ -270,11 +270,11 @@ async def main() -> None:
     intents.reactions = True
 
     root_logger = logging.getLogger()
-    root_logger.setLevel(logging.INFO)
 
     # Create a console handler
     console_handler = logging.StreamHandler()
     console_handler.setFormatter(CustomFormatter())
+    console_handler.setLevel(logging.INFO)
 
     # Create a file handler
 
