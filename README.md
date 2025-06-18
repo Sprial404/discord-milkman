@@ -1,6 +1,6 @@
 # Discord Milkman Bot
 
-A personal Discord bot I made for my Discord server with my mates! This Python bot functionalities are subject to change without notice, but I have listed some of its functionality below.
+A personal Discord bot I made for my Discord server with my mates! The functionalities are subject to change without notice, but I have listed some of it below.
 
 ## Features
 - **Temporary Channels:** Easily create and manage temporary voice or text channels.
