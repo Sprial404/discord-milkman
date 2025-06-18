@@ -2,6 +2,7 @@
 This cog contains the interaction for creating a temporary voice channel.
 """
 
+import asyncio
 import logging
 from datetime import datetime
 
@@ -72,25 +73,33 @@ class TemporaryVoice(commands.Cog, name=TEMPORARY_VOICE_COG_NAME):
         """
         logger.debug(f"Voice state update for {member.name}: {before} -> {after}")
         
+        # Check if the member has moved to a temporary voice channel and create one if needed
         if after.channel is not None and after.channel.name == TEMPORARY_VOICE_CHANNEL_NAME:
             member_name = member.nick or member.name 
             temporary_channel_name = f"{member_name}'s Area"
+
+
             temporary_channel = await after.channel.clone(
                 name=temporary_channel_name,
                 reason="Temporary voice channel",
             )
             
-            channel = await self.bot.db.add_temporary_channel(
-                channel_id=temporary_channel.id,
-                guild_id=temporary_channel.guild.id,
-                user_id=member.id,
+            # Set the channel's permissions, move the member, and add it to the database.
+            channel = asyncio.gather(
+                self.bot.db.add_temporary_channel(
+                    channel_id=temporary_channel.id,
+                    guild_id=temporary_channel.guild.id,
+                    user_id=member.id,
+                ),
+                temporary_channel.set_permissions(member, manage_channels=True),
+                member.move_to(temporary_channel)
             )
             
-            self.temporary_channels[str(temporary_channel.id)] = channel# Give member permission to manage the channel
-            await temporary_channel.set_permissions(member, manage_channels=True)
+            self.temporary_channels[str(temporary_channel.id)] = channel
             logger.info(f"Created temporary voice channel: {temporary_channel.name} for {member.name}")
-            await member.move_to(temporary_channel)
+            
         
+        # Check if the member has left a temporary voice channel
         if before.channel is not None:
             # Check if the channel being left is a temporary channel
             channel_id = str(before.channel.id)
