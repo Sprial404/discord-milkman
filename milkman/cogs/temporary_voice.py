@@ -36,6 +36,7 @@ class TemporaryVoice(commands.Cog, name=TEMPORARY_VOICE_COG_NAME):
         channels_to_remove = []
         for channel_id, temporary_channel in list(self.temporary_channels.items()):
             channel = self.bot.get_channel(int(temporary_channel.channel_id))
+
             if channel is None:
                 logger.warning(f"Temporary channel {temporary_channel.channel_id} not found in cache, marking for removal")
                 channels_to_remove.append(channel_id)
@@ -55,7 +56,8 @@ class TemporaryVoice(commands.Cog, name=TEMPORARY_VOICE_COG_NAME):
         for channel_id in channels_to_remove:
             if channel_id in self.temporary_channels:
                 logger.info(f"Removing temporary channel {channel_id} from tracking")
-                await self.bot.db.remove_temporary_channel(
+
+                await self.bot.db.remove_temporary_channel( # type: ignore
                     channel_id=channel_id,
                     guild_id=self.temporary_channels[channel_id].guild_id,
                 )
@@ -86,7 +88,7 @@ class TemporaryVoice(commands.Cog, name=TEMPORARY_VOICE_COG_NAME):
             
             # Set the channel's permissions, move the member, and add it to the database.
             channel = asyncio.gather(
-                self.bot.db.add_temporary_channel(
+                self.bot.db.add_temporary_channel( # type: ignore
                     channel_id=temporary_channel.id,
                     guild_id=temporary_channel.guild.id,
                     user_id=member.id,
@@ -103,22 +105,28 @@ class TemporaryVoice(commands.Cog, name=TEMPORARY_VOICE_COG_NAME):
         if before.channel is not None:
             # Check if the channel being left is a temporary channel
             channel_id = str(before.channel.id)
+
             if channel_id in self.temporary_channels and len(before.channel.members) == 0:
                 logger.info(f"Deleting temporary voice channel: {before.channel.name} as it is empty")
+
                 await before.channel.delete(reason="Temporary voice channel empty")
-                await self.bot.db.remove_temporary_channel(
+                await self.bot.db.remove_temporary_channel( # type: ignore
                     channel_id=before.channel.id,
                     guild_id=before.channel.guild.id,
-                )                # Remove the channel from the dictionary
+                )
+
+                # Remove the channel from the dictionary
                 del self.temporary_channels[channel_id]
 
     async def cog_load(self):
         """
         Load the cog and set up any necessary listeners or initial state.
         """
-        active_channels = await self.bot.db.get_active_temporary_channels()
+        active_channels = await self.bot.db.get_active_temporary_channels() # type: ignore
+
         # Convert list to dictionary with channel_id as key
         self.temporary_channels = {str(channel.channel_id): channel for channel in active_channels}
+        
         await self.clean_up()
 
     async def cog_unload(self):
