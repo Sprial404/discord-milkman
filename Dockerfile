@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 ARG PYTHON_VERSION=3.13.3
-FROM python:${PYTHON_VERSION}-slim as base
+FROM python:${PYTHON_VERSION}-slim AS base
 
 # Prevents Python from writing pyc files.
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -43,4 +43,4 @@ COPY --chown=appuser:appuser . .
 # Switch to the non-privileged user to run the application.
 USER appuser
 VOLUME [ "/data" ]
-CMD python -m milkman.bot
+CMD ["python", "-m", "milkman.bot"]
