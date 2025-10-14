@@ -161,12 +161,13 @@ class Moderation(commands.Cog, name=MODERATION_COG_NAME):
         """
 
         member = ctx.guild.get_member(user.id) or await ctx.guild.fetch_member(user.id)
-        await self.bot.db.add_warning(
-            user.id,
-            ctx.guild.id,
-            ctx.author.id,
-            reason,
-        )
+        async with self.bot.get_db_service() as db:
+            await db.warnings.add_warning(
+                str(user.id),
+                str(ctx.guild.id),
+                str(ctx.author.id),
+                reason,
+            )
         embed = discord.Embed(
             description=f"Warned **{member}** from the server by **{ctx.author}**.",
             color=SUCCESS_COLOR,
@@ -201,7 +202,8 @@ class Moderation(commands.Cog, name=MODERATION_COG_NAME):
             id (int): The id of the warning to remove.
         """
         member = ctx.guild.get_member(user.id) or await ctx.guild.fetch_member(user.id)
-        await self.bot.db.remove_warning(id, user.id, ctx.guild.id)
+        async with self.bot.get_db_service() as db:
+            await db.warnings.remove_warning(id, str(user.id), str(ctx.guild.id))
         embed = discord.Embed(
             description=f"Removed warning **{id}** from **{member}**.",
             color=SUCCESS_COLOR,
@@ -223,7 +225,8 @@ class Moderation(commands.Cog, name=MODERATION_COG_NAME):
             ctx (Context): The context of the command.
             user (discord.User): The user to list warnings for.
         """
-        warnings = await self.bot.db.get_warnings(user.id, ctx.guild.id)
+        async with self.bot.get_db_service() as db:
+            warnings = await db.warnings.get_warnings(str(user.id), str(ctx.guild.id))
         if not warnings:
             embed = discord.Embed(
                 description="No warnings found for this user.",

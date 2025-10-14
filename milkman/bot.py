@@ -9,7 +9,8 @@ from discord.ext.commands import Context
 from dotenv import load_dotenv
 
 from .constants import ERROR_COLOR
-from .util.database import Database
+from .util.database import DatabaseConfig
+from .util.repositories import DatabaseService
 
 
 class CustomFormatter(logging.Formatter):
@@ -67,7 +68,7 @@ class Supervisor(commands.Bot):
         bot_prefix: str,
         data_path: str,
         logger: logging.Logger,
-        db: Database,
+        db_config: DatabaseConfig,
         **kwargs,
     ):
         super().__init__(
@@ -80,7 +81,12 @@ class Supervisor(commands.Bot):
         self.logger = logger
         self.data_path = data_path
         self.bot_prefix = bot_prefix
-        self.db = db
+        self.db_config = db_config
+    
+    async def get_db_service(self):
+        """Get a database service context manager for use in cogs."""
+        async with self.db_config.get_session() as session:
+            yield DatabaseService(session)
 
     async def load_cogs(self) -> None:
         """
@@ -138,8 +144,7 @@ class Supervisor(commands.Bot):
             raise RuntimeError("The bot has not been logged in yet.")
 
         self.logger.info(f"Logged in as {self.user.name}")
-        await self.db.connect()
-        await self.db.create_tables()
+        await self.db_config.create_tables()
         await self.load_cogs()
         self.update_status.start()
 
@@ -314,11 +319,11 @@ async def main() -> None:
         logger.error("The environment variable BOT_PREFIX is not set")
         exit(1)
 
-    db = Database(os.path.join(data_dir, "milkman.db"))
+    db_config = DatabaseConfig(os.path.join(data_dir, "milkman.db"))
 
     async with Supervisor(
         data_path=data_dir,
-        db=db,
+        db_config=db_config,
         bot_prefix=bot_prefix,
         logger=logger,
         intents=intents,
