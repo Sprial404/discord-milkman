@@ -4,13 +4,11 @@ This cog contains the interaction for creating a temporary voice channel.
 
 import asyncio
 import logging
-from datetime import datetime
 
 import discord
 from discord.ext import commands
 
 from milkman.constants import TEMPORARY_VOICE_COG_NAME, TEMPORARY_VOICE_CHANNEL_NAME
-from milkman.util.database import TemporaryChannel
 
 logger = logging.getLogger(__name__)
 

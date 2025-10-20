@@ -1,5 +1,4 @@
 from discord.ext import commands
-from discord.ext.commands import Context
 
 from milkman.constants import REACTION_ROLES_COG_NAME
 
