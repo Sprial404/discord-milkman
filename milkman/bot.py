@@ -2,6 +2,7 @@ import asyncio
 import logging
 import os
 import random
+from contextlib import asynccontextmanager
 
 import discord
 from discord.ext import commands, tasks
@@ -83,6 +84,7 @@ class Supervisor(commands.Bot):
         self.bot_prefix = bot_prefix
         self.db_config = db_config
     
+    @asynccontextmanager
     async def get_db_service(self):
         """Get a database service context manager for use in cogs."""
         async with self.db_config.get_session() as session:

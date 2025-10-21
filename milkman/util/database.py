@@ -2,6 +2,7 @@
 SQLAlchemy-based database management for the Discord bot.
 """
 
+from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
@@ -26,6 +27,7 @@ class DatabaseConfig:
         async with self.engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
     
+    @asynccontextmanager
     async def get_session(self) -> AsyncGenerator[AsyncSession, None]:
         """Get an async database session."""
         async with self.async_session() as session:
