@@ -75,7 +75,7 @@ class General(commands.Cog, name=GENERAL_COG_NAME):
 
 async def setup(bot: commands.Bot) -> None:
     """
-    Setup the General cog.
+    Set up the General cog.
 
     Args:
         bot (commands.Bot): The bot instance.

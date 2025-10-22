@@ -2,8 +2,8 @@
 This cog is used to manage the bot and adds a bunch of commands that are only available to the owner of the bot.
 
 Commands:
-    - sync: Syncronises the slash commands.
-    - unsync: Unsyncronises the slash commands.
+    - sync: Synchronises the slash commands.
+    - unsync: Synchronises the slash commands.
     - load: Loads a cog.
     - unload: Unloads a cog.
     - reload: Reloads a cog.
@@ -29,20 +29,20 @@ class Owner(commands.Cog, name=OWNER_COG_NAME):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
-    @commands.command(name="sync", description="Syncronises the slash commands.")
+    @commands.command(name="sync", description="Synchronises the slash commands.")
     @app_commands.describe(
-        scope="The scope of the syncronisation, which can be global or guild.",
+        scope="The scope of the synchronisation, which can be global or guild.",
     )
     @commands.is_owner()
     async def sync(
         self, ctx: Context, scope: Literal["global", "guild"] = "global"
     ) -> None:
         """
-        Syncronises the slash commands.
+        Synchronises the slash commands.
 
         Args:
             ctx (Context): The context of the command.
-            scope (str): The scope of the syncronisation.
+            scope (str): The scope of the synchronisation.
         """
 
         embed = discord.Embed(
@@ -53,28 +53,28 @@ class Owner(commands.Cog, name=OWNER_COG_NAME):
 
         if scope == "global":
             await self.bot.tree.sync()
-            embed.description = "Syncronised the slash commands globally."
+            embed.description = "Synchronised the slash commands globally."
             await msg.edit(embed=embed)
         elif scope == "guild":
             self.bot.tree.copy_global_to(guild=ctx.guild)
             await self.bot.tree.sync(guild=ctx.guild)
-            embed.description = "Syncronised the slash commands for this guild."
+            embed.description = "Synchronised the slash commands for this guild."
             await msg.edit(embed=embed)
 
-    @commands.command(name="unsync", description="Unsyncronises the slash commands.")
+    @commands.command(name="unsync", description="Synchronises the slash commands.")
     @app_commands.describe(
-        scope="The scope of the unsyncronisation, which can be global or guild.",
+        scope="The scope of the synchronisation, which can be global or guild.",
     )
     @commands.is_owner()
     async def unsync(
         self, ctx: Context, scope: Literal["global", "guild"] = "global"
     ) -> None:
         """
-        Unsyncronises the slash commands.
+        Synchronises the slash commands.
 
         Args:
             ctx (Context): The context of the command.
-            scope (str): The scope of the unsyncronisation.
+            scope (str): The scope of the synchronisation.
         """
 
         embed = discord.Embed(
@@ -86,12 +86,12 @@ class Owner(commands.Cog, name=OWNER_COG_NAME):
         if scope == "global":
             self.bot.tree.clear_commands(guild=None)
             await self.bot.tree.sync()
-            embed.description = "Unsyncronised the slash commands globally."
+            embed.description = "Synchronised the slash commands globally."
             await msg.edit(embed=embed)
         elif scope == "guild":
             self.bot.tree.clear_commands(guild=ctx.guild)
             await self.bot.tree.sync(guild=ctx.guild)
-            embed.description = "Unsyncronised the slash commands for this guild."
+            embed.description = "Synchronised the slash commands for this guild."
             await msg.edit(embed=embed)
 
     @commands.hybrid_command(name="load", description="Loads a cog.")
@@ -257,7 +257,7 @@ class Owner(commands.Cog, name=OWNER_COG_NAME):
 
 async def setup(bot: commands.Bot) -> None:
     """
-    Setup the Owner cog.
+    Set up the Owner cog.
 
     Args:
         bot (commands.Bot): The bot instance.

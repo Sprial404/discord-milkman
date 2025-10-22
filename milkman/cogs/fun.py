@@ -43,7 +43,8 @@ class Fun(Cog, name=FUN_COG_NAME):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
-    async def _get_lyrics(self, artist: str, title: str) -> Optional[str]:
+    @staticmethod
+    async def _get_lyrics(artist: str, title: str) -> Optional[str]:
         """
         Get the lyrics to a song.
         """
@@ -103,9 +104,11 @@ class Fun(Cog, name=FUN_COG_NAME):
 
         lyrics = await self._get_lyrics(artist, song)
         if lyrics is None:
-            embed.title = "🔴"
-            embed.description = "No lyrics found for the given song and artist."
-            embed.color = ERROR_COLOR
+            embed = discord.Embed(
+                title="🔴",
+                description = "No lyrics found for the given song and artist.",
+                color = ERROR_COLOR,
+            )
             await msg.edit(embed=embed)
             return
 
@@ -339,8 +342,6 @@ class Fun(Cog, name=FUN_COG_NAME):
         items = ["🍎", "🍊", "🍌", "🍇", "🍓", "🍒", "🍑", "🍍", "🥝", "🥑"]
         result = random.choices(items, k=3)
 
-        message = ""
-        won = False
         if result[0] == result[1] == result[2] == "🍒":
             message = "Jackpot! 💰💰💰"
             won = True
@@ -404,8 +405,10 @@ class Fun(Cog, name=FUN_COG_NAME):
         else:
             response += " You lost! 😢"
 
-        embed.description = response
-        embed.color = SUCCESS_COLOR if picked_color == result else ERROR_COLOR
+        embed = discord.Embed(
+            description=response,
+            color=SUCCESS_COLOR if picked_color == result else ERROR_COLOR
+        )
         await msg.edit(embed=embed)
 
     @commands.hybrid_command(name="avatar", description="Get a random avatar quote.")
@@ -427,7 +430,7 @@ class Fun(Cog, name=FUN_COG_NAME):
 
 async def setup(bot: commands.Bot) -> None:
     """
-    Setup the Fun cog.
+    Set up the Fun cog.
 
     Args:
         bot (commands.Bot): The bot instance.

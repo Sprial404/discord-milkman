@@ -157,7 +157,7 @@ class Moderation(commands.Cog, name=MODERATION_COG_NAME):
         Args:
             ctx (Context): The context of the command.
             user (discord.User): The user that is being warned.
-            reason (str): The reason for the warn, defaulting to "No reason provided."
+            reason (str): The reason for to warn, defaulting to "No reason provided."
         """
 
         member = ctx.guild.get_member(user.id) or await ctx.guild.fetch_member(user.id)
@@ -252,18 +252,16 @@ class Moderation(commands.Cog, name=MODERATION_COG_NAME):
     )
     @app_commands.describe(
         amount="The amount of messages to purge.",
-        user="The user to purge messages from.",
     )
     @commands.has_permissions(manage_messages=True)
     @commands.bot_has_permissions(manage_messages=True)
-    async def purge(self, ctx: Context, amount: int, user: discord.User = None) -> None:
+    async def purge(self, ctx: Context, amount: int) -> None:
         """
         Purge messages from the server.
 
         Args:
             ctx (Context): The context of the command.
             amount (int): The amount of messages to purge.
-            user (discord.User): The user to purge messages from, defaulting to None.
         """
 
         await ctx.send("Deleting messages...")
@@ -278,7 +276,7 @@ class Moderation(commands.Cog, name=MODERATION_COG_NAME):
 
 async def setup(bot: commands.Bot) -> None:
     """
-    Setup the moderation cog.
+    Set up the moderation cog.
 
     Args:
         bot (commands.Bot): The bot to add the cog to.

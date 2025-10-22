@@ -14,7 +14,7 @@ class ReactionRoles(commands.Cog, name=REACTION_ROLES_COG_NAME):
 
 async def setup(bot: commands.Bot) -> None:
     """
-    Setup the ReactionRoles cog.
+    Set up the ReactionRoles cog.
 
     Args:
         bot (commands.Bot): The bot instance.
